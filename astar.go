@@ -64,11 +64,9 @@ func (nodes Nodes) FindPath(start *Node, goal *Node) []*Node {
 		if currentNode.x == goal.x && currentNode.y == goal.y {
 			path := make([]*Node, 0, pathSize)
 			n := currentNode
-			c := 0
 			for n != nil {
 				path = append(path, n)
 				n = n.parent
-				c = c + 1
 			}
 			return path
 		}
