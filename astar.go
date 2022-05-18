@@ -1,6 +1,7 @@
-package main
+package astar
 
 import (
+	"fmt"
 	"math"
 	"sort"
 )
@@ -19,6 +20,7 @@ type Nodes struct {
 	ySize uint32
 }
 type NodeRefs []*Node
+type Path []*Node
 
 func CreateNodes(x, y uint32) Nodes {
 	nodes := Nodes{
@@ -51,7 +53,7 @@ func (a NodeRefs) Less(i, j int) bool { return a[i].f < a[j].f }
 func (a NodeRefs) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 // Returns a slice of Node addresses. If the slice is nil, path was not found.
-func (nodes Nodes) FindPath(start *Node, goal *Node) []*Node {
+func (nodes Nodes) FindPath(start *Node, goal *Node) Path {
 	openNodes := make([]*Node, 0, 5)
 	closedNodes := make(map[*Node]bool)
 	openNodes = append(openNodes, start)
@@ -121,4 +123,17 @@ func distance(n1 *Node, n2 *Node) float64 {
 	return math.Sqrt(
 		xPow + yPow,
 	)
+}
+
+func (p Path) String() (str string) {
+	pLen := len(p)
+	for i := range p {
+		n := p[i]
+		str += fmt.Sprintf("[%v %v]", n.x, n.y)
+		if i != pLen-1 {
+			str += "<--"
+		}
+	}
+
+	return str
 }
