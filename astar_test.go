@@ -2,7 +2,7 @@ package astar
 
 import "testing"
 
-func TestPathFinding(t *testing.T) {
+func TestPathFinding1(t *testing.T) {
 	nodes := CreateNodes(5, 5)
 
 	start := nodes.Access(0, 0)
@@ -11,6 +11,20 @@ func TestPathFinding(t *testing.T) {
 	path := nodes.FindPath(start, goal)
 
 	if len(path) != 5 {
+		t.Error(path)
+		t.Fail()
+	}
+}
+
+func TestPathFinding2(t *testing.T) {
+	nodes := CreateNodes(5, 5)
+
+	start := nodes.Access(0, 0)
+	goal := nodes.Access(0, 2)
+
+	path := nodes.FindPath(start, goal)
+
+	if len(path) != 3 {
 		t.Error(path)
 		t.Fail()
 	}
