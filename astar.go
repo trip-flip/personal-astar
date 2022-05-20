@@ -1,18 +1,25 @@
 package astar
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"sort"
 )
 
+const (
+	Walkable = '.'
+	Obstacle = '#'
+)
+
 type Node struct {
-	parent *Node
-	x      uint32
-	y      uint32
-	f      float64
-	g      float64
-	h      float64
+	parent   *Node
+	nodeType byte
+	x        uint32
+	y        uint32
+	f        float64
+	g        float64
+	h        float64
 }
 type Nodes struct {
 	nodes []Node
@@ -29,13 +36,12 @@ func CreateNodes(x, y uint32) Nodes {
 		ySize: y,
 	}
 	nArray := nodes.nodes
-	// We redefine
-	x = 0
-	y = 0
+	x, y = 0, 0
 	for i := range nArray {
 		node := &nArray[i]
 		node.x = x
 		node.y = y
+		node.nodeType = '.'
 
 		if x == nodes.xSize-1 {
 			x = 0
@@ -46,6 +52,39 @@ func CreateNodes(x, y uint32) Nodes {
 	}
 
 	return nodes
+}
+
+// Only reads square maps currently
+func ReadMap(m string) (Nodes, error) {
+	nodes := Nodes{}
+	mapLen := len(m)
+	s := int(math.Sqrt(float64(mapLen)))
+	if s*s != mapLen {
+		return nodes, errors.New("provided map string is not a square grid")
+	}
+
+	size := uint32(s)
+	nodes.nodes = make([]Node, mapLen)
+	nodes.xSize = size
+	nodes.ySize = size
+
+	nArray := nodes.nodes
+	var x, y uint32 = 0, 0
+	for i := range nArray {
+		node := &nArray[i]
+		node.x = x
+		node.y = y
+		node.nodeType = m[i]
+
+		if x == nodes.xSize-1 {
+			x = 0
+			y += 1
+		} else {
+			x += 1
+		}
+	}
+
+	return nodes, nil
 }
 
 func (a NodeRefs) Len() int           { return len(a) }
@@ -76,7 +115,10 @@ func (nodes Nodes) FindPath(start *Node, goal *Node) Path {
 		for _, n := range nodes.neighbors(currentNode.x, currentNode.y) {
 			_, isClosed := closedNodes[n]
 
-			if isClosed || n == nil {
+			if isClosed || n == nil || n.nodeType == Obstacle {
+				if n != nil {
+					fmt.Println(n.nodeType)
+				}
 				continue
 			}
 
